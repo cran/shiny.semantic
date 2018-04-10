@@ -1,7 +1,4 @@
 
-<link href="http://fonts.googleapis.com/css?family=Lato:300,700,300italic|Inconsolata" rel="stylesheet" type="text/css">
-
-<link href='inst/assets/styles/style.css' rel='stylesheet' type='text/css'>
 
 shiny.semantic
 ==============
@@ -9,6 +6,8 @@ shiny.semantic
 Semantic UI wrapper for Shiny
 
 With this library it's easy to wrap Shiny with [Semantic UI components](https://github.com/Semantic-Org/Semantic-UI). Add a few simple lines of code and some CSS classes to give your UI a fresh, modern and highly interactive look.
+
+`master` branch contains the stable version. Use `develop` branch for latest features.
 
 <h2>
 Before
@@ -30,20 +29,22 @@ After
 <p style="text-align: center; font-size: x-large;">
 <a href="http://demo.appsilondatascience.com/shiny.semantic/components">Components live demo</a>
 </p>
-
+</div>
 Source code
 -----------
 
 This library source code can be found on [Appsilon Data Science's](http://appsilondatascience.com) Github: <br> <https://github.com/Appsilon/shiny.semantic>
+
+[![CircleCI](https://circleci.com/gh/Appsilon/shiny.semantic/tree/develop.svg?style=svg)](https://circleci.com/gh/Appsilon/shiny.semantic/tree/develop)
 
 How to install?
 ---------------
 
 **Note! This library is still in its infancy. Api might change in the future.**
 
-At the moment it's possible to install this library through [devtools](https://github.com/hadley/devtools).
+You can install shiny.semantic from CRAN repository:
 
-    devtools::install_github("Appsilon/shiny.semantic")
+    install.packages("shiny.semantic")
 
 To install [previous version]() you can run:
 
@@ -152,7 +153,6 @@ Some Semantic UI elements require to run a specific JS code when DOM document is
     })
 
     shinyApp(ui = ui(), server = server)
-        
 
 Component examples
 ------------------
@@ -161,10 +161,31 @@ Component examples
 
 ![](inst/assets/README_files/figure-markdown_githubunnamed-chunk-7-1.png) <!--html_preserve-->
 <pre>
-<code class="r">div(class = "ui raised segment", div(class = "ui relaxed divided list", c("Apples", 
-    "Pears", "Oranges") %&gt;% purrr::map(~div(class = "item", uiicon("large github middle aligned"), 
-    div(class = "content", a(class = "header", "Hello"), div(class = "description", 
-        .))))))</code>
+<code class="r">div(
+  class = "ui raised segment",
+  div(
+    class = "ui relaxed divided list",
+    c(
+      "Apples", "Pears",
+      "Oranges"
+    ) %&gt;%
+      purrr::map(~div(
+        class = "item",
+        uiicon("large github middle aligned"),
+        div(
+          class = "content",
+          a(
+            class = "header",
+            "Hello"
+          ),
+          div(
+            class = "description",
+            .
+          )
+        )
+      ))
+  )
+)</code>
 </pre>
 
 <!--/html_preserve-->
@@ -172,13 +193,44 @@ Component examples
 
 ![](inst/assets/README_files/figure-markdown_githubunnamed-chunk-9-1.png) <!--html_preserve-->
 <pre>
-<code class="r">div(class = "ui card", div(class = "content", div(class = "right floated meta", "14h"), 
-    img(class = "ui avatar image", src = "http://semantic-ui.com/images/avatar/large/elliot.jpg"), 
-    "Elliot"), div(class = "image", img(src = "http://semantic-ui.com/images/wireframe/image.png")), 
-    div(class = "content", span(class = "right floated", uiicon("heart outline like"), 
-        "17 likes"), uiicon("comment"), "3 comments"), div(class = "extra content", 
-        div(class = "ui large transparent left icon input", uiicon("heart ouline"), 
-            tags$input(type = "text", placeholder = "Add Comment..."))))</code>
+<code class="r">div(
+  class = "ui card",
+  div(
+    class = "content",
+    div(
+      class = "right floated meta",
+      "14h"
+    ), img(
+      class = "ui avatar image",
+      src = "http://semantic-ui.com/images/avatar/large/elliot.jpg"
+    ),
+    "Elliot"
+  ), div(
+    class = "image",
+    img(src = "http://semantic-ui.com/images/wireframe/image.png")
+  ),
+  div(
+    class = "content",
+    span(
+      class = "right floated",
+      uiicon("heart outline like"),
+      "17 likes"
+    ),
+    uiicon("comment"),
+    "3 comments"
+  ),
+  div(
+    class = "extra content",
+    div(
+      class = "ui large transparent left icon input",
+      uiicon("heart ouline"),
+      tags$input(
+        type = "text",
+        placeholder = "Add Comment..."
+      )
+    )
+  )
+)</code>
 </pre>
 
 <!--/html_preserve-->
@@ -228,10 +280,6 @@ Future enhacements
 -   CRAN release
 
 Appsilon Data Science
-=====================
-
-We Provide End-to-End Data Science Solutions
-
-<a href="http://appsilondatascience.com"><img alt="Appsilon Data Science" src="https://cdn.rawgit.com/Appsilon/website-cdn/gh-pages/logo-white.png" /></a>
+---------------------
 
 Get in touch [dev@appsilondatascience.com](dev@appsilondatascience.com)
