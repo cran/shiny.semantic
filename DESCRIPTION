@@ -1,7 +1,7 @@
 Package: shiny.semantic
 Type: Package
 Title: Semantic UI Support for Shiny
-Version: 0.1.2
+Version: 0.2.0
 Authors@R: person("Filip", "Stachura", email = "filip@appsilondatascience.com",
   role = c("aut", "cre"))
 Description: Creating a great user interface for your Shiny apps
@@ -19,8 +19,8 @@ Imports: utils, shiny (>= 0.12.1), htmltools (>= 0.2.6), htmlwidgets
 Suggests: dplyr, gapminder, testthat, lintr
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2018-04-10 11:34:28 UTC; dominik
+Packaged: 2018-04-20 09:19:13 UTC; dominik
 Author: Filip Stachura [aut, cre]
 Maintainer: Filip Stachura <filip@appsilondatascience.com>
 Repository: CRAN
-Date/Publication: 2018-04-10 11:49:24 UTC
+Date/Publication: 2018-04-20 09:53:22 UTC

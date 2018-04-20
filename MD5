@@ -1,4 +1,4 @@
-115f03f78e370f57df0e8a9f8c5ad4c8 *DESCRIPTION
+acc6cc2413bd11ca9804d01516f69fa9 *DESCRIPTION
 5a943ff62b8c10bd59cc12ae3d1f4ca2 *LICENSE
 f746182a54c6a19a38a111beae78ec8e *NAMESPACE
 f5e4d87b0ca483e944fb1ba579147c25 *R/constants.R
@@ -17,9 +17,9 @@ a83dffca5147f097ae3f411e382e93f0 *inst/assets/README_files/figure-markdown_githu
 2867aae92199b6e84bce5ff93f152c35 *inst/assets/README_files/figure-markdown_githubunnamed-chunk-7-1.png
 96fe4454f69947d5947f1629e9516379 *inst/assets/README_files/figure-markdown_githubunnamed-chunk-9-1.png
 4631592c274d57f49cb513dc5b05033f *inst/assets/styles/style.css
-07158f4819e67f69fa98b08f685c2935 *inst/htmlwidgets/uirender.js
-55226069393de99454f47f5185b645ed *inst/htmlwidgets/uirender.yaml
-b88ddcfa999844dd7c92671ae7b5b41b *inst/prepare_package_cran.sh
+6e77704fb0bd4519264685d340d382f4 *inst/htmlwidgets/uirender.js
+ba078b45b2e41956eaa61c309339998c *inst/htmlwidgets/uirender.yaml
+0366de3f1403a66c81d934912eb26554 *inst/prepare_package_cran.sh
 b26c2701a2875c365ac4a4f0e684d0d3 *inst/semantic-range/range.css
 080aa647b9c930017672743f37cca8cf *inst/semantic-range/range.js
 8d03fc59d7080f3b5ae79e7cb5c32d5e *inst/www/shiny-custom-input.js
