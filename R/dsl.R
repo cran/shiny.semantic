@@ -26,53 +26,84 @@ uiicon <- function(type = "", ...) {
 uilabel <- function(..., type = "", is_link = TRUE) {
   label_tag <- if (is_link) tags$a else tags$div
   label_tag(class = paste("ui label", type),
-      list(...))
+            list(...))
+}
+
+#' Sets tab id if not provided
+#'
+#' Sets tab id if it wasn't provided
+#'
+#' @param tab A tab. Tab is a list of three elements - first
+#' element defines menu item, second element defines tab content, third optional element defines tab id.
+set_tab_id <- function(tab) {
+  id <- tab$id
+  menu <- tab$menu
+  content <- tab$content
+  list(id = if (!is.null(id)) id else generate_random_id("tab"),
+       menu = menu, content = content)
 }
 
 #' Create Semantic UI tabs
 #'
 #' This creates tabs with content using Semantic UI styles.
 #'
-#' @param tabs A list of tabs. Each tab is a list of two elements - first
-#' element defines menu item, second element defines tab content.
+#' @param tabs A list of tabs. Each tab is a list of three elements - first
+#' element defines menu item, second element defines tab content, third optional element defines tab id.
+#' @param active Id of the active tab. If NULL first tab will be active.
 #' @param id Id of the menu element (default: randomly generated id)
 #' @param menu_class Class for the menu element (default: "top attached
 #' tabular")
 #' @param tab_content_class Class for the tab content (default: "bottom attached
 #' segment")
 #'
+#' @details You may access active tab id with \code{input$<id>_tab}.
+#'
 #' @export
+#'
+#' @examples
+#' tabset(list(
+#' list(menu = shiny::div("First link"),
+#'      content = shiny::div("First content")),
+#' list(menu = shiny::div("Second link"),
+#'      content = shiny::div("Second content"))
+#' ))
 tabset <- function(tabs,
+                   active = NULL,
                    id = generate_random_id("menu"),
                    menu_class = "top attached tabular",
                    tab_content_class = "bottom attached segment") {
-  identifiers <- replicate(length(tabs),
-                           list(id = generate_random_id("tab")),
-                           simplify = FALSE)
-  id_tabs <- purrr::map2(identifiers, tabs, ~ c(.x, .y))
+  id_tabs <- tabs %>% purrr::map(~ set_tab_id(.x))
+  valid_ids <- id_tabs %>% purrr::map_chr(~ .x$id)
+  active_tab <- if (!is.null(active)) active else valid_ids[1] # nolint
   script_code <- paste0(
-    " // Code below is needed to trigger visibility on reactive Shiny outputs.
+    " $(document).on('shiny:sessioninitialized', function(event) {
+        Shiny.onInputChange('", id, "_tab', '", active_tab, "');
+      });
+      // Code below is needed to trigger visibility on reactive Shiny outputs.
       // Thanks to that users do not have to set suspendWhenHidden to FALSE.
       var previous_tab;
       $('#", id, ".menu .item').tab({
-      onVisible: function(target) {
-      if (previous_tab) {
-      $(this).trigger('hidden');
-      }
-      $(window).resize();
-      $(this).trigger('shown');
-      previous_tab = this;}});")
+        onVisible: function(target) {
+          if (previous_tab) {
+            $(this).trigger('hidden');
+          }
+          $(window).resize();
+          $(this).trigger('shown');
+          previous_tab = this;
+          Shiny.onInputChange('", id, "_tab', $(this).attr('data-tab'))
+        }
+      });")
   shiny::tagList(
     shiny::div(id = id,
                class = paste("ui menu", menu_class),
                purrr::map(id_tabs, ~ {
-                 class <- paste("item", if (.$id == id_tabs[[1]]$id) "active" else "")
+                 class <- paste("item", if (.$id == active_tab) "active" else "") # nolint
                  shiny::a(class = class, `data-tab` = .$id, .$menu)
                })
     ),
     purrr::map(id_tabs, ~ {
       class <- paste("ui tab", tab_content_class,
-                     if (.$id == id_tabs[[1]]$id) "active" else "")
+                     if (.$id == active_tab) "active" else "") # nolint
       shiny::div(class = class, `data-tab` = .$id, .$content)
     }),
     shiny::tags$script(script_code)
@@ -239,87 +270,18 @@ uimessage <- function(header, content, type = "", icon, closable = FALSE) {
       message_else_content)
 }
 
-
-#' Create dropdown Semantic UI component
-#'
-#' This creates a default dropdown using Semantic UI styles with Shiny input.
-#' Dropdown is already initialized and available under input[[name]].
-#'
-#' @param name Input name. Reactive value is available under input[[name]].
-#' @param choices All available options one can select from.
-#' @param choices_value What reactive value should be used for corresponding
-#' choice.
-#' @param default_text Text to be visible on dropdown when nothing is selected.
-#' @param value Pass value if you want to initialize selection for dropdown.
-#'
-#' @examples
-#' ## Only run examples in interactive R sessions
-#' if (interactive()) {
-#'
-#'   library(shiny)
-#'   library(shiny.semantic)
-#'   ui <- function() {
-#'       shinyUI(
-#'         semanticPage(
-#'           title = "Dropdown example",
-#'           suppressDependencies("bootstrap"),
-#'           uiOutput("dropdown"),
-#'           p("Selected letter:"),
-#'           textOutput("selected_letter")
-#'        )
-#'      )
-#'   }
-#'   server <- shinyServer(function(input, output) {
-#'      output$dropdown <- renderUI({
-#'          dropdown("simple_dropdown", LETTERS, value = "A")
-#'      })
-#'      output$selected_letter <- renderText(input[["simple_dropdown"]])
-#'   })
-#'
-#'   shinyApp(ui = ui(), server = server)
-#' }
-#'
-#' @export
-dropdown <- function(name,
-                     choices,
-                     choices_value = choices,
-                     default_text = "Select",
-                     value = NULL) {
-  unique_dropdown_class <- paste0("dropdown_name_", name)
-  class <- paste("ui selection fluid dropdown", unique_dropdown_class)
-
-  shiny::tagList(
-    shiny::div(class = class,
-               shiny_text_input(name,
-                                shiny::tags$input(type = "hidden", name = name),
-                                value = value
-               ),
-               uiicon("dropdown"),
-               shiny::div(class = "default text", default_text),
-               uimenu(
-                          purrr::map2(choices, choices_value, ~
-                                        menu_item(`data-value` = .y, .x)
-                          )
-               )
-    ),
-    shiny::tags$script(paste0(
-      "$('.ui.dropdown.", unique_dropdown_class,
-      "').dropdown().dropdown('set selected', '", value, "');"
-    ))
-  )
-}
-
 #' Create Semantic UI Menu
 #'
 #' This creates a menu using Semantic UI.
 #'
-#' @param ... Menu items to be created. Use menu_item function to create new menu item. Use uidropdown(is_menu_item = TRUE, ...)
-#' function to create new dropdown menu item. Use menu_header and menu_divider functions to customize menu format.
+#' @param ... Menu items to be created. Use menu_item function to create new menu item.
+#' Use uidropdown(is_menu_item = TRUE, ...) function to create new dropdown menu item.
+#' Use menu_header and menu_divider functions to customize menu format.
 #' @param type Type of the menu. Look at https://semantic-ui.com/collections/menu.html for all possiblities.
 #'
 #' @examples
 #'
-#' if (interactive()){
+#' if (interactive()) {
 #' library(shiny)
 #' library(shiny.semantic)
 #'
@@ -392,7 +354,8 @@ menu_item <- function(..., item_feature = "", style = NULL, href = NULL) {
 #' @param type Type of the dropdown. Look at https://semantic-ui.com/modules/dropdown.html for all possibilities.
 #' @param name Unique name of the created dropdown.
 #' @param is_menu_item TRUE if the dropdown is a menu item. Default is FALSE.
-#' @param dropdown_specs A list of dropdown functionalities. Look at https://semantic-ui.com/modules/dropdown.html#/settings for all possibilities.
+#' @param dropdown_specs A list of dropdown functionalities.
+#' Look at https://semantic-ui.com/modules/dropdown.html#/settings for all possibilities.
 #'
 #' @examples
 #'
@@ -466,14 +429,15 @@ menu_divider <- function(...) {
 
 #' Helper function to render list element
 #'
-#' @param data data to list
+#' @param data data to list; data.frame with fields
+#' header, icon, description
 #' @param is_description description flag
-#' @param icon Icon character
+#' @param is_icon Icon logical to add icon from data
 #' @param row row character
 #'
 #' @import shiny
-list_element <- function(data, is_description, icon, row) {
-  div(class = "item",  if (icon == "") "" else uiicon(icon),
+list_element <- function(data, is_description, is_icon, row) {
+  div(class = "item",  if (is_icon) uiicon(data$icon[row]) else "",
       if (is_description) {
         div(class = "content",
             div(class = "header", data$header[row]),
@@ -481,39 +445,43 @@ list_element <- function(data, is_description, icon, row) {
       } else {
         div(class = "content", data$header[row])
       }
-      )
+  )
 }
 
 #' Create Semantic UI list with header, description and icons
 #'
 #' This creates a list with icons using Semantic UI
 #'
-#' @param data A dataframe with columns `header` and/or `description` containing the list items
-#' headers and descriptions. `description` column is optional and should be provided
-#' if `is_description` parameter TRUE.
-#' @param icon A string with icon name. Empty string will render list without icons.
+#' @param data A dataframe with columns `header` and/or `description`, `icon` containing the list items
+#' headers, descriptions and icons. `description` column is optional and should be provided
+#' if `is_description` parameter TRUE. `icon` column is optional and should be provided
+#' if `is_icon` parameter TRUE. Icon column should contain strings with icon names available
+#' here: https://semantic-ui.com/elements/icon.html
+#' @param is_icon IF TRUE created list has icons
 #' @param is_divided If TRUE created list elements are divided
 #' @param is_description If TRUE created list will have a description
 #'
 #' @export
 #' @import shiny
+#' @import magrittr
 #' @examples
 #'
 #' list_content <- data.frame(
 #'   header = paste("Header", 1:5),
 #'   description = paste("Description", 1:5),
+#'   icon = paste("home", 1:5),
 #'   stringsAsFactors = FALSE
 #' )
 #'
 #' # Create a 5 element divided list with alert icons and description
-#' uilist(list_content, "alert", is_divided = TRUE, is_description = TRUE)
-uilist <- function(data, icon, is_divided = FALSE, is_description = FALSE){
+#' uilist(list_content, is_icon = TRUE, is_divided = TRUE, is_description = TRUE)
+uilist <- function(data, is_icon = FALSE, is_divided = FALSE, is_description = FALSE) {
   divided_list <- ifelse(is_divided, "divided", "")
   list_class <- paste("ui", divided_list, "list")
 
   div(class = list_class,
-      1:nrow(data) %>% purrr::map(function(row){
-        list_element(data, is_description, icon, row)
-        })
+      seq_len(nrow(data)) %>% purrr::map(function(row) {
+        list_element(data, is_description, is_icon, row)
+      })
   )
 }
