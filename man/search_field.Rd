@@ -4,10 +4,10 @@
 \alias{search_field}
 \title{Create search field Semantic UI component}
 \usage{
-search_field(name, search_api_url, default_text = "Search", value = "")
+search_field(input_id, search_api_url, default_text = "Search", value = "")
 }
 \arguments{
-\item{name}{Input name. Reactive value is available under input[[name]].}
+\item{input_id}{Input name. Reactive value is available under input[[input_id]].}
 
 \item{search_api_url}{Register custom API url with server JSON Response
 containing fields `title` and `description`.}
@@ -19,7 +19,7 @@ is selected.}
 }
 \description{
 This creates a default search field using Semantic UI styles with Shiny
-input. Search field is already initialized and available under input[[name]].
+input. Search field is already initialized and available under input[[input_id]].
 Search will automatically route to the named API endpoint provided
 as parameter. API response is expected to be a JSON with property fields
 `title` and `description`.
@@ -38,9 +38,10 @@ ui <- function() {
   shinyUI(
     semanticPage(
       title = "Dropdown example",
-      uiOutput("search_letters"),
-      p("Selected letter:"),
-      textOutput("selected_letters")
+      p("Search country:"),
+      uiOutput("search_country"),
+      p("Selected country:"),
+      textOutput("selected_country")
    )
   )
 }
@@ -65,7 +66,7 @@ server <- shinyServer(function(input, output, session) {
  output$search_letters <- shiny::renderUI(
    search_field("search_result", search_api_url)
  )
- output$selected_letters <- renderText(input[["search_result"]])
+ output$selected_country <- renderText(input[["search_result"]])
 })
 }
 

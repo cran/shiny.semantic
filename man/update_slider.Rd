@@ -2,25 +2,52 @@
 % Please edit documentation in R/slider.R
 \name{update_slider}
 \alias{update_slider}
-\alias{update_range}
+\alias{update_range_input}
+\alias{updateSliderInput}
 \title{Update slider Semantic UI component}
 \usage{
-update_slider(session, name, value)
+update_slider(session, input_id, value)
 
-update_range(session, name, value, value2)
+update_range_input(session, input_id, value, value2)
+
+updateSliderInput(session, inputId, value, ...)
 }
 \arguments{
 \item{session}{The \code{session} object passed to function given to \code{shinyServer}.}
 
-\item{name}{The id of the input object}
+\item{input_id}{The id of the input object}
 
 \item{value}{The value to be selected for the sldier (lower value if using range).}
 
-\item{value2}{The upper value of the slider.}
+\item{value2}{The upper value of the range.}
+
+\item{inputId}{Input name.}
+
+\item{...}{additional arguments}
 }
 \description{
-Change the value of a \code{\link{uislider}} input on the client.
+Change the value of a \code{\link{slider_input}} input on the client.
+}
+\examples{
+## Only run this example in interactive R sessions
+if (interactive()) {
+  shinyApp(
+    ui = semanticPage(
+      p("The first slider controls the second"),
+      slider_input("control", "Controller:", min = 0, max = 20, value = 10,
+                   step = 1),
+      slider_input("receive", "Receiver:", min = 0, max = 20, value = 10,
+                   step = 1)
+    ),
+    server = function(input, output, session) {
+      observe({
+        update_slider(session, "receive", value = input$control)
+      })
+    }
+  )
+}
+
 }
 \seealso{
-uislider
+slider_input
 }

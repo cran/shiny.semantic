@@ -2,30 +2,118 @@
 #'
 #' This creates an icon tag using Semantic UI styles.
 #'
-#' @param type A name of an icon. Look at
+#' @param class A name of an icon. Look at
 #' http://semantic-ui.com/elements/icon.html for all possibilities.
 #' @param ... Other arguments to be added as attributes of the
 #' tag (e.g. style, class etc.)
 #'
+#' @examples
+#'
+#' if (interactive()){
+#' library(shiny)
+#' library(shiny.semantic)
+#'
+#' ui <- function() {
+#'   shinyUI(
+#'     semanticPage(
+#'       # Basic icon
+#'       icon("home"),
+#'       br(),
+#'       # Different size
+#'       icon("small home"),
+#'       icon("large home"),
+#'       br(),
+#'       # Disabled icon
+#'       icon("disabled home"),
+#'       br(),
+#'       # Loading icon
+#'       icon("spinner loading"),
+#'       br(),
+#'       # Icon formatted as link
+#'       icon("close link"),
+#'       br(),
+#'       # Flipped
+#'       icon("horizontally flipped cloud"),
+#'       icon("vertically flipped cloud"),
+#'       br(),
+#'       # Rotated
+#'       icon("clockwise rotated cloud"),
+#'       icon("counterclockwise rotated cloud"),
+#'       br(),
+#'       # Circular
+#'       icon("circular home"),
+#'       br(),
+#'       # Bordered
+#'       icon("bordered home"),
+#'       br(),
+#'       # Colored
+#'       icon("red home"),
+#'       br(),
+#'       # inverted
+#'       segment(class = "inverted", icon("inverted home"))
+#'     )
+#'   )
+#' }
+#'
+#' server <- shinyServer(function(input, output, session) {
+#'
+#' })
+#'
+#' shinyApp(ui = ui(), server = server)
+#' }
+#'
 #' @export
-uiicon <- function(type = "", ...) {
-  shiny::tags$i(class = paste(type, "icon"), ...)
+icon <- function(class = "", ...) {
+  shiny::tags$i(class = paste(class, "icon"), ...)
 }
 
 #' Create Semantic UI label tag
 #'
-#' This creates a label tag using Semantic UI.
+#' This creates a \code{div} or \code{a} tag with with class \code{ui label} using Semantic UI.
 #'
 #' @param ... Other arguments to be added such as content of the tag (text, icons) and/or attributes (style)
-#' @param type Type of the label. Look at https://semantic-ui.com/elements/label.html for all possibilities.
+#' @param class class of the label. Look at https://semantic-ui.com/elements/label.html for all possibilities.
 #' @param is_link If TRUE creates label with 'a' tag, otherwise with 'div' tag.
 #' #'
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(
+#'     semanticPage(
+#'       ## label
+#'       label(icon = icon("mail icon"), 23),
+#'       p(),
+#'       ## pointing label
+#'       field(
+#'         text_input("ex", label = "", type = "text", placeholder = "Your name")),
+#'       label("Please enter a valid name", class = "pointing red basic"),
+#'       p(),
+#'       ## tag
+#'       label(class = "tag", "New"),
+#'       label(class = "red tag", "Upcoming"),
+#'       label(class =" teal tag","Featured"),
+#'       ## ribbon
+#'       segment(class = "ui raised segment",
+#'               label(class = "ui red ribbon", "Overview"),
+#'               "Text"),
+#'       ## attached
+#'       segment(class = "ui raised segment",
+#'               label(class = "top attached", "HTML"),
+#'               p("Text"))
+#'     ))
+#'   server <- function(input, output, session) {
+#'   }
+#'   shinyApp(ui, server)
+#' }
 #' @export
 #'
 #' @import shiny
-uilabel <- function(..., type = "", is_link = TRUE) {
-  label_tag <- if (is_link) tags$a else tags$div
-  label_tag(class = paste("ui label", type),
+label <- function(..., class = "", is_link = TRUE) {
+  label_container <- if (is_link) tags$a else tags$div
+  label_container(class = paste("ui label", class),
             list(...))
 }
 
@@ -61,12 +149,29 @@ set_tab_id <- function(tab) {
 #' @export
 #'
 #' @examples
-#' tabset(list(
-#' list(menu = shiny::div("First link"),
-#'      content = shiny::div("First content")),
-#' list(menu = shiny::div("Second link"),
-#'      content = shiny::div("Second content"))
-#' ))
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     tabset(tabs =
+#'              list(
+#'                list(menu = "First Tab", content = "Tab 1"),
+#'                list(menu = "Second Tab", content = "Tab 2", id = "second_tab")
+#'              ),
+#'            active = "second_tab",
+#'            id = "exampletabset"
+#'     ),
+#'     h2("Active Tab:"),
+#'     textOutput("activetab")
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
+#'
 tabset <- function(tabs,
                    active = NULL,
                    id = generate_random_id("menu"),
@@ -110,11 +215,6 @@ tabset <- function(tabs,
   )
 }
 
-generate_random_id <- function(prefix, id_length = 20) {
-  random_id <- paste(sample(letters, id_length, replace = TRUE), collapse = "")
-  paste0(prefix, "-", random_id)
-}
-
 #' Create Semantic UI header
 #'
 #' This creates a header with optional icon using Semantic UI styles.
@@ -123,10 +223,25 @@ generate_random_id <- function(prefix, id_length = 20) {
 #' @param description Subheader text
 #' @param icon Optional icon name
 #'
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     header(title = "Header with description", description = "Description"),
+#'     header(title = "Header with icon", description = "Description", icon = "dog")
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #' @export
-uiheader <- function(title, description, icon = NULL) {
+header <- function(title, description, icon = NULL) {
   shiny::h2(class = "ui header",
-            if (!is.null(icon)) uiicon(icon),
+            if (!is.null(icon)) icon(icon),
             shiny::div(class = "content", title,
                        shiny::div(class = "sub header", description)
             )
@@ -140,9 +255,39 @@ uiheader <- function(title, description, icon = NULL) {
 #' @param ... Other arguments to be added as attributes of the
 #' tag (e.g. style, class or childrens etc.)
 #' @param class Additional classes to add to html tag.
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     cards(
+#'       class = "two",
+#'       card(
+#'         div(class="content",
+#'             div(class="header", "Elliot Fu"),
+#'             div(class="meta", "Friend"),
+#'             div(class="description", "Elliot Fu is a film-maker from New York.")
+#'         )
+#'       ),
+#'       card(
+#'         div(class="content",
+#'             div(class="header", "John Bean"),
+#'             div(class="meta", "Friend"),
+#'             div(class="description", "John Bean is a film-maker from London.")
+#'         )
+#'       )
+#'     )
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #'
 #' @export
-uicards <- function(..., class = "") {
+cards <- function(..., class = "") {
   shiny::div(class = paste("ui cards", class), ...)
 }
 
@@ -153,9 +298,29 @@ uicards <- function(..., class = "") {
 #' @param ... Other arguments to be added as attributes of the
 #' tag (e.g. style, class or childrens etc.)
 #' @param class Additional classes to add to html tag.
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     card(
+#'       div(class="content",
+#'           div(class="header", "Elliot Fu"),
+#'           div(class="meta", "Friend"),
+#'           div(class="description", "Elliot Fu is a film-maker from New York.")
+#'       )
+#'     )
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #'
 #' @export
-uicard <- function(..., class = "") {
+card <- function(..., class = "") {
   shiny::div(class = paste("ui card", class), ...)
 }
 
@@ -166,9 +331,31 @@ uicard <- function(..., class = "") {
 #' @param ... Other arguments to be added as attributes of the
 #' tag (e.g. style, class or childrens etc.)
 #' @param class Additional classes to add to html tag.
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     segment(),
+#'     # placeholder
+#'     segment(class = "placeholder segment"),
+#'     # raised
+#'     segment(class = "raised segment"),
+#'     # stacked
+#'     segment(class = "stacked segment"),
+#'     #  piled
+#'     segment(class = "piled segment")
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #'
 #' @export
-uisegment <- function(..., class = "") {
+segment <- function(..., class = "") {
   shiny::div(class = paste("ui segment", class), ...)
 }
 
@@ -179,9 +366,46 @@ uisegment <- function(..., class = "") {
 #' @param ... Other arguments to be added as attributes of the
 #' tag (e.g. style, class or childrens etc.)
 #' @param class Additional classes to add to html tag.
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     form(
+#'       field(
+#'         tags$label("Text"),
+#'         text_input("text_ex", value = "", type = "text", placeholder = "Enter Text...")
+#'       )
+#'     ),
+#'     # loading form
+#'     form(class = "loading form",
+#'          field(
+#'            tags$label("Text"),
+#'            text_input("text_ex", value = "", type = "text", placeholder = "Enter Text...")
+#'          )),
+#'     # size variations mini form
+#'     form(class = "mini",
+#'          field(
+#'            tags$label("Text"),
+#'            text_input("text_ex", value = "", type = "text", placeholder = "Enter Text...")
+#'          )),
+#'     # massive
+#'     form(class = "massive",
+#'          field(
+#'            tags$label("Text"),
+#'            text_input("text_ex", value = "", type = "text", placeholder = "Enter Text...")
+#'          ))
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #'
 #' @export
-uiform <- function(..., class = "") {
+form <- function(..., class = "") {
   shiny::tags$form(class = paste("ui form", class),
                    ...
   )
@@ -194,9 +418,33 @@ uiform <- function(..., class = "") {
 #' @param ... Other arguments to be added as attributes of the
 #' tag (e.g. style, class or childrens etc.)
 #' @param class Additional classes to add to html tag.
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     form(
+#'       fields(class = "two",
+#'              field(
+#'                tags$label("Name"),
+#'                text_input("name", value = "", type = "text", placeholder = "Enter Name...")
+#'              ),
+#'              field(
+#'                tags$label("Surname"),
+#'                text_input("surname", value = "", type = "text", placeholder = "Enter Surname...")
+#'              ))
+#'     )
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #'
 #' @export
-uifields <- function(..., class = "") {
+fields <- function(..., class = "") {
   shiny::div(class = paste("fields", class), ...)
 }
 
@@ -207,46 +455,91 @@ uifields <- function(..., class = "") {
 #' @param ... Other arguments to be added as attributes of the
 #' tag (e.g. style, class or childrens etc.)
 #' @param class Additional classes to add to html tag.
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     form(
+#'       field(
+#'         tags$label("Name"),
+#'         text_input("name", value = "", type = "text", placeholder = "Enter Name...")
+#'       ),
+#'       # error field
+#'       field(
+#'         class = "error",
+#'         tags$label("Name"),
+#'         text_input("name", value = "", type = "text", placeholder = "Enter Name...")
+#'       ),
+#'       # disabled
+#'       field(
+#'         class = "disabled",
+#'         tags$label("Name"),
+#'         text_input("name", value = "", type = "text", placeholder = "Enter Name...")
+#'       )
+#'     )
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #'
 #' @export
-uifield <- function(..., class = "") {
+field <- function(..., class = "") {
   shiny::div(class = paste("field", class), ...)
 }
 
-#' Create HTML label tag
+#' Create Semantic UI Message box
 #'
-#' This creates a HTML label tag.
-#'
-#' @param ... Other arguments to be added as attributes of the
-#' tag (e.g. style, class or childrens etc.)
-#'
-#' @export
-label <- function(...) {
-  shiny::tags$label(...)
-}
-
-#' Create Semantic UI Message
-#'
-#' @param header Header of the message
-#' @param content Content of the message. If it is a vector, creates a list of
-#' vector's elements
-#' @param type Type of the message. Look at
+#' @param header Header of the message box
+#' @param content Content of the message box . If it is a vector, creates a list
+#' of vector's elements
+#' @param class class of the message. Look at
 #' https://semantic-ui.com/collections/message.html for all possibilities.
-#' @param icon If the message is of the type 'icon', specify the icon.
+#' @param icon_name If the message is of the type 'icon', specify the icon.
 #' Look at http://semantic-ui.com/elements/icon.html for all possibilities.
 #' @param closable Determines whether the message should be closable.
 #' Default is FALSE - not closable
+#' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
+#'
+#'   ui <- shinyUI(semanticPage(
+#'     message_box(header = "Main header", content = "text"),
+#'     # message with icon
+#'     message_box(class = "icon", header = "Main header", content = "text", icon_name = "dog"),
+#'     # closable message
+#'     message_box(header = "Main header", content = "text", closable =  TRUE),
+#'     # floating
+#'     message_box(class = "floating", header = "Main header", content = "text"),
+#'     # compact
+#'     message_box(class = "compact", header = "Main header", content = "text"),
+#'     # warning
+#'     message_box(class = "warning", header = "Warning", content = "text"),
+#'     # info
+#'     message_box(class = "info", header = "Info", content = "text")
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
 #'
 #' @export
-uimessage <- function(header, content, type = "", icon, closable = FALSE) {
+message_box <- function(header, content, class = "", icon_name, closable = FALSE) {
   if (length(content) > 1) {
     content <- shiny::tags$ul(class = "list", lapply(content, shiny::tags$li))
   }
-  if (grepl("icon", type)) {
-    if (missing(icon)) {
-      stop("Type 'icon' requires an icon!")
+  if (grepl("icon", class)) {
+    if (missing(icon_name)) {
+      stop("If you give a class 'icon', then an icon_name argument is required")
     }
-    icon_else_header <- uiicon(icon)
+    icon_else_header <- icon(icon_name)
     message_else_content <- shiny::div(class = "content",
                                        shiny::div(class = "header", header),
                                        content)
@@ -254,7 +547,7 @@ uimessage <- function(header, content, type = "", icon, closable = FALSE) {
     icon_else_header <- shiny::div(class = "header", header)
     message_else_content <- content
   }
-  div(class = paste("ui message", type),
+  div(class = paste("ui message", class),
       if (closable) {
         closable_messages <- "$('.message .close')
           .on('click', function() {
@@ -264,7 +557,7 @@ uimessage <- function(header, content, type = "", icon, closable = FALSE) {
             ;
           })
         ;"
-        uiicon("close icon", shiny::tags$script(shiny::HTML(closable_messages)))
+        icon("close icon", shiny::tags$script(shiny::HTML(closable_messages)))
       },
       icon_else_header,
       message_else_content)
@@ -275,53 +568,51 @@ uimessage <- function(header, content, type = "", icon, closable = FALSE) {
 #' This creates a menu using Semantic UI.
 #'
 #' @param ... Menu items to be created. Use menu_item function to create new menu item.
-#' Use uidropdown(is_menu_item = TRUE, ...) function to create new dropdown menu item.
+#' Use dropdown_menu(is_menu_item = TRUE, ...) function to create new dropdown menu item.
 #' Use menu_header and menu_divider functions to customize menu format.
-#' @param type Type of the menu. Look at https://semantic-ui.com/collections/menu.html for all possiblities.
+#' @param class Class extension.Look at https://semantic-ui.com/collections/menu.html
+#' for all possibilities.
 #'
+#' @rdname menu
 #' @examples
-#'
+#' ## Only run examples in interactive R sessions
 #' if (interactive()) {
-#' library(shiny)
-#' library(shiny.semantic)
+#'   library(shiny)
+#'   library(shiny.semantic)
 #'
-#' ui <- function() {
-#'   shinyUI(
-#'     semanticPage(
-#'       title = "My page",
-#'       suppressDependencies("bootstrap"),
-#'       uimenu(menu_item("Menu"),
-#'              uidropdown(
+#'   ui <- function() {
+#'     shinyUI(
+#'       semanticPage(
+#'         title = "My page",
+#'         menu(menu_item("Menu"),
+#'              dropdown_menu(
 #'                "Action",
-#'                uimenu(
-#'                  menu_header(uiicon("file"), "File", is_item = FALSE),
-#'                  menu_item(uiicon("wrench"), "Open"),
-#'                  menu_item(uiicon("upload"), "Upload"),
-#'                 menu_item(uiicon("remove"), "Upload"),
+#'                menu(
+#'                  menu_header(icon("file"), "File", is_item = FALSE),
+#'                  menu_item(icon("wrench"), "Open"),
+#'                  menu_item(icon("upload"), "Upload"),
+#'                  menu_item(icon("remove"), "Upload"),
 #'                  menu_divider(),
-#'                  menu_header(uiicon("user"), "User", is_item = FALSE),
-#'                  menu_item(uiicon("add user"), "Add"),
-#'                  menu_item(uiicon("remove user"), "Remove")),
-#'                type = "",
+#'                  menu_header(icon("user"), "User", is_item = FALSE),
+#'                  menu_item(icon("add user"), "Add"),
+#'                  menu_item(icon("remove user"), "Remove")),
+#'                class = "",
 #'                name = "unique_name",
 #'                is_menu_item = TRUE),
-#'              menu_item(uiicon("user"), "Profile", href = "#index", item_feature = "active"),
+#'              menu_item(icon("user"), "Profile", href = "#index", item_feature = "active"),
 #'              menu_item("Projects", href = "#projects"),
-#'              menu_item(uiicon("users"), "Team"),
-#'              uimenu(menu_item(uiicon("add icon"), "New tab"), type = "right"))
+#'              menu_item(icon("users"), "Team"),
+#'              menu(menu_item(icon("add icon"), "New tab"), class = "right"))
+#'       )
 #'     )
-#'   )
+#'   }
+#'   server <- shinyServer(function(input, output) {})
+#'   shinyApp(ui = ui(), server = server)
 #' }
-#'
-#' server <- shinyServer(function(input, output) {
-#' })
-#'
-#' shinyApp(ui = ui(), server = server)
-#'}
 #' @export
-uimenu <- function(..., type = "") {
-  class <- "ui menu"
-  div(class = paste(class, type),
+menu <- function(..., class = "") {
+  class <- paste("ui menu", class)
+  div(class =  class,
       list(...))
 }
 
@@ -335,8 +626,8 @@ uimenu <- function(..., type = "") {
 #' @param href If NULL (default) menu_item is created with 'div' tag. Otherwise it is created with 'a' tag, and
 #' parameeter defines its href attribute.
 #'
+#' @seealso menu
 #' @export
-#'
 #' @import shiny
 menu_item <- function(..., item_feature = "", style = NULL, href = NULL) {
   menu_item_tag <- if (!is.null(href)) tags$a else tags$div
@@ -351,29 +642,42 @@ menu_item <- function(..., item_feature = "", style = NULL, href = NULL) {
 #' This creates a dropdown using Semantic UI.
 #'
 #' @param ... Dropdown content.
-#' @param type Type of the dropdown. Look at https://semantic-ui.com/modules/dropdown.html for all possibilities.
+#' @param class class of the dropdown. Look at https://semantic-ui.com/modules/dropdown.html for all possibilities.
 #' @param name Unique name of the created dropdown.
 #' @param is_menu_item TRUE if the dropdown is a menu item. Default is FALSE.
 #' @param dropdown_specs A list of dropdown functionalities.
 #' Look at https://semantic-ui.com/modules/dropdown.html#/settings for all possibilities.
 #'
 #' @examples
+#' ## Only run examples in interactive R sessions
+#' if (interactive()){
+#'   library(shiny)
+#'   library(shiny.semantic)
 #'
-#' uidropdown(
-#'   "Dropdown menu",
-#'   uiicon(type = "dropdown"),
-#'   uimenu(
-#'     menu_header("Header"),
-#'     menu_divider(),
-#'     menu_item("Option 1"),
-#'     menu_item("Option 2")
-#'   ),
-#'   name = "dropdown_menu",
-#'   dropdown_specs = list("duration: 500")
-#' )
+#'   ui <- shinyUI(semanticPage(
+#'     dropdown_menu(
+#'       "Dropdown menu",
+#'       icon(class = "dropdown"),
+#'       menu(
+#'         menu_header("Header"),
+#'         menu_divider(),
+#'         menu_item("Option 1"),
+#'         menu_item("Option 2")
+#'       ),
+#'       name = "dropdown_menu",
+#'       dropdown_specs = list("duration: 500")
+#'     )
+#'
+#'   ))
+#'   server <- shinyServer(function(input, output) {
+#'   })
+#'
+#'   shinyApp(ui, server)
+#' }
+#'
 #' @import shiny
 #' @export
-uidropdown <- function(..., type = "", name, is_menu_item = FALSE, dropdown_specs = list()) {
+dropdown_menu <- function(..., class = "", name, is_menu_item = FALSE, dropdown_specs = list()) {
 
   if (missing(name)) {
     stop("Dropdown requires unique name. Specify \"name\" argument.")
@@ -382,9 +686,9 @@ uidropdown <- function(..., type = "", name, is_menu_item = FALSE, dropdown_spec
   unique_dropdown_class <- paste0("dropdown_name_", name)
 
   if (is_menu_item) {
-    class <- paste("ui dropdown item", type, unique_dropdown_class)
+    class <- paste("ui dropdown item", class, unique_dropdown_class)
   } else {
-    class <- paste("ui dropdown", type, unique_dropdown_class)
+    class <- paste("ui dropdown", class, unique_dropdown_class)
   }
 
   dropdown_functionality <- paste(dropdown_specs, collapse = ", ")
@@ -404,6 +708,8 @@ uidropdown <- function(..., type = "", name, is_menu_item = FALSE, dropdown_spec
 #' @param ... Content of the header: text, icons, etc.
 #' @param is_item If TRUE created header is item of Semantic UI Menu.
 #'
+#' @seealso menu
+#'
 #' @export
 #'
 #' @import shiny
@@ -421,6 +727,8 @@ menu_header <- function(..., is_item = TRUE) {
 #'
 #' @param ... Other attributes of the divider such as style.
 #'
+#' @seealso menu
+#'
 #' @export
 #'
 menu_divider <- function(...) {
@@ -429,22 +737,16 @@ menu_divider <- function(...) {
 
 #' Helper function to render list element
 #'
-#' @param data data to list; data.frame with fields
-#' header, icon, description
-#' @param is_description description flag
-#' @param is_icon Icon logical to add icon from data
-#' @param row row character
+#' @param header character with header element
+#' @param description character with content of the list
+#' @param icon_name character with optional icon
 #'
 #' @import shiny
-list_element <- function(data, is_description, is_icon, row) {
-  div(class = "item",  if (is_icon) uiicon(data$icon[row]) else "",
-      if (is_description) {
-        div(class = "content",
-            div(class = "header", data$header[row]),
-            div(class = "description", data$description[row]))
-      } else {
-        div(class = "content", data$header[row])
-      }
+list_element <- function(header = NULL, description = NULL, icon_name = NULL) {
+  div(class = "item",  if (!is.null(icon)) icon(icon_name) else "",
+      div(class = "content",
+          div(class = "header", header),
+          div(class = "description", description))
   )
 }
 
@@ -452,36 +754,98 @@ list_element <- function(data, is_description, is_icon, row) {
 #'
 #' This creates a list with icons using Semantic UI
 #'
-#' @param data A dataframe with columns `header` and/or `description`, `icon` containing the list items
-#' headers, descriptions and icons. `description` column is optional and should be provided
-#' if `is_description` parameter TRUE. `icon` column is optional and should be provided
-#' if `is_icon` parameter TRUE. Icon column should contain strings with icon names available
-#' here: https://semantic-ui.com/elements/icon.html
-#' @param is_icon IF TRUE created list has icons
+#' @param content_list list of lists with fields: `header` and/or `description`,
+#' `icon` containing the list items headers, descriptions (one of these is mandatory)
+#' and icons. Icon column should contain strings with icon names available
+#' here: https://fomantic-ui.com/elements/icon.html
 #' @param is_divided If TRUE created list elements are divided
-#' @param is_description If TRUE created list will have a description
 #'
 #' @export
 #' @import shiny
 #' @import magrittr
 #' @examples
-#'
-#' list_content <- data.frame(
-#'   header = paste("Header", 1:5),
-#'   description = paste("Description", 1:5),
-#'   icon = paste("home", 1:5),
-#'   stringsAsFactors = FALSE
+#' library(shiny)
+#' library(shiny.semantic)
+#' list_content <- list(
+#'   list(header = "Head", description = "Lorem ipsum", icon = "cat"),
+#'   list(header = "Head 2", icon = "tree"),
+#'   list(description = "Lorem ipsum 2", icon = "dog")
 #' )
+#' if (interactive()){
+#'   ui <- semanticPage(
+#'     list_container(list_content, is_divided = TRUE)
+#'  )
+#'   server <- function(input, output) {}
+#'   shinyApp(ui, server)
+#' }
 #'
-#' # Create a 5 element divided list with alert icons and description
-#' uilist(list_content, is_icon = TRUE, is_divided = TRUE, is_description = TRUE)
-uilist <- function(data, is_icon = FALSE, is_divided = FALSE, is_description = FALSE) {
+list_container <- function(content_list, is_divided = FALSE) {
   divided_list <- ifelse(is_divided, "divided", "")
   list_class <- paste("ui", divided_list, "list")
-
   div(class = list_class,
-      seq_len(nrow(data)) %>% purrr::map(function(row) {
-        list_element(data, is_description, is_icon, row)
+      content_list %>% purrr::map(function(x) {
+        if (is.null(x$header) && is.null(x$description))
+          stop("content_list needs to have either header or description.")
+        list_element(x$header, x$description, x$icon)
       })
+  )
+}
+
+
+#' Accordion UI
+#'
+#' In accordion you may display a list of elements that can be hidden or
+#' shown with one click.
+#'
+#' @param accordion_list list with lists with fields: `title` and `content`
+#' @param fluid if accordion is fluid then it takes width of parent div
+#' @param active_title if active title matches `title` from \code{accordion_list}
+#' then this element is active by default
+#' @param styled if switched of then raw style (no boxes) is used
+#' @param custom_style character with custom style added to CSS of accordion (advanced use)
+#'
+#' @return shiny tag list with accordion UI
+#' @export
+#'
+#' @examples
+#' if (interactive()) {
+#' library(shiny)
+#' library(shiny.semantic)
+#' accordion_content <- list(
+#'   list(title = "AA", content = h2("a a a a")),
+#'   list(title = "BB", content = p("b b b b"))
+#' )
+#' shinyApp(
+#'   ui = semanticPage(
+#'     accordion(accordion_content, fluid = F, active_title = "AA",
+#'               custom_style = "background: #babade;")
+#'   ),
+#'   server = function(input, output) {}
+#' )
+#' }
+accordion <- function(accordion_list, fluid = TRUE, active_title = "",
+                      styled = TRUE, custom_style = "") {
+  fluid <- ifelse(fluid, "fluid", "")
+  styled <- ifelse(styled, "styled", "")
+  accordion_class = glue::glue("ui {styled} {fluid} accordion")
+  shiny::tagList(
+    div(class = accordion_class, style = custom_style,
+        accordion_list %>% purrr::map(function(x) {
+          if (is.null(x$title) || is.null(x$content))
+            stop("There must be both title and content fields in `accordion_list`")
+          active <- ifelse(x$title == active_title, "active", "")
+          shiny::tagList(
+            div(class = paste("title", active), icon("dropdown"), x$title),
+            div(class = paste("content", active),
+                p(class = "transition hidden",
+                  if (class(x$content) == "shiny.tag") x$content else div(x$content)
+                )
+            )
+          )
+        })
+    ),
+    shiny::tags$script(HTML(
+      glue::glue("$('.ui.accordion').accordion();")
+    ))
   )
 }

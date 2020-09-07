@@ -4,7 +4,13 @@
 \alias{semanticPage}
 \title{Semantic UI page}
 \usage{
-semanticPage(..., title = "", theme = NULL)
+semanticPage(
+  ...,
+  title = "",
+  theme = NULL,
+  suppress_bootstrap = TRUE,
+  margin = "10px"
+)
 }
 \arguments{
 \item{...}{Other arguments to be added as attributes of the main div tag
@@ -14,6 +20,10 @@ wrapper (e.g. style, class etc.)}
 
 \item{theme}{Theme name or path. Full list of supported themes you will find in
 \code{SUPPORTED_THEMES} or at http://semantic-ui-forest.com/themes.}
+
+\item{suppress_bootstrap}{boolean flag that supresses bootstrap when turned on}
+
+\item{margin}{character with body margin size}
 }
 \description{
 This creates a Semantic page for use in a Shiny app.
@@ -29,4 +39,29 @@ takes dependencies from custom css and js files specified in this path
 either "min" or standard version. The folder should contain: \code{semantic.css} and
 \code{semantic.js} files, or \code{semantic.min.css} and \code{semantic.min.js}
 in \code{shiny.minified = TRUE} mode.
+}
+\examples{
+## Only run examples in interactive R sessions
+if (interactive()) {
+library(shiny)
+library(shiny.semantic)
+
+ui <- semanticPage(
+  title = "Hello Shiny Semantic!",
+  tags$label("Number of observations:"),
+  slider_input("obs", value = 500, min = 0, max = 1000),
+  segment(
+    plotOutput("dist_plot")
+  )
+)
+
+server <- function(input, output) {
+  output$dist_plot <- renderPlot({
+    hist(rnorm(input$obs))
+  })
+}
+
+shinyApp(ui, server)
+}
+
 }
