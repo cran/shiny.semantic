@@ -9,7 +9,8 @@
 #' @param min The minimum value allowed to be selected for the slider.
 #' @param max The maximum value allowed to be selected for the slider.
 #' @param step The interval between each selectable value of the slider.
-#' @param class UI class of the slider. Can include \code{"Labeled"} and \code{"ticked"}.
+#' @param class UI class of the slider. Can include \code{"labeled"} and \code{"ticked"}.
+#' @param custom_ticks A vector of custom labels to be added to the slider. Will ignore \code{min} and \code{max}
 #'
 #' @details
 #' Use \code{\link{update_slider}} to update the slider/range within the shiny session.
@@ -18,69 +19,97 @@
 #'
 #' @examples
 #' if (interactive()) {
-#'
+#'   # Slider example
 #'   library(shiny)
 #'   library(shiny.semantic)
 #'
-#'   # Slider example
 #'   ui <- shinyUI(
 #'     semanticPage(
 #'       title = "Slider example",
 #'       tags$br(),
-#'       slider_input("slider", 10, 0, 20),
+#'       slider_input("slider", 10, 0, 20, class = "labeled ticked"),
 #'       p("Selected value:"),
 #'       textOutput("slider")
 #'     )
 #'   )
+#'   server <- shinyServer(function(input, output, session) {
+#'     output$slider <- renderText(input$slider)
+#'   })
+#'   shinyApp(ui = ui, server = server)
 #'
-#'    server <- shinyServer(function(input, output, session) {
-#'      output$slider <- renderText(input$slider)
-#'    })
-#'
-#'    shinyApp(ui = ui, server = server)
-#'
-#'    # Range example
-#'    ui <- shinyUI(
-#'      semanticPage(
-#'        title = "Range example",
-#'        tags$br(),
-#'        range_input("range", 10, 15, 0, 20),
-#'        p("Selected values:"),
-#'        textOutput("range")
+#'   # Custom ticks slider
+#'   ui <- shinyUI(
+#'     semanticPage(
+#'       title = "Slider example",
+#'       tags$br(),
+#'       slider_input("slider_ticks", "F", custom_ticks = LETTERS, class = "labeled ticked"),
+#'       p("Selected value:"),
+#'       textOutput("slider_ticks")
 #'     )
 #'   )
+#'   server <- shinyServer(function(input, output, session) {
+#'     output$slider_ticks <- renderText(input$slider_ticks)
+#'   })
+#'   shinyApp(ui = ui, server = server)
 #'
-#'    server <- shinyServer(function(input, output, session) {
-#'      output$range <- renderText(paste(input$range, collapse = " - "))
-#'    })
-#'
-#'    shinyApp(ui = ui, server = server)
-#'
-#'  }
+#'   # Range example
+#'   ui <- shinyUI(
+#'     semanticPage(
+#'       title = "Range example",
+#'       tags$br(),
+#'       range_input("range", 10, 15, 0, 20),
+#'       p("Selected values:"),
+#'       textOutput("range")
+#'     )
+#'   )
+#'   server <- shinyServer(function(input, output, session) {
+#'     output$range <- renderText(paste(input$range, collapse = " - "))
+#'   })
+#'   shinyApp(ui = ui, server = server)
+#' }
 #'
 #' @seealso update_slider for input updates,
 #' \url{https://fomantic-ui.com/modules/slider.html} for preset classes.
 #'
 #' @export
-slider_input <- function(input_id, value, min, max, step = 1, class = NULL) {
-  div(
-    id = input_id, class = paste("ui slider", class),
-    `data-min` = min, `data-max` = max, `data-step` = step, `data-start` = value
-  )
+slider_input <- function(input_id, value, min, max, step = 1, class = "labeled", custom_ticks = NULL) {
+  if (!is.null(custom_ticks)) {
+    custom_ticks <- paste0("[\"", paste0(custom_ticks, collapse = "\", \""), "\"]")
+    div(
+      id = input_id, class = paste("ui slider ss-slider", class),
+      `data-start` = value, `data-ticks` = custom_ticks
+    )
+  } else {
+    div(
+      id = input_id, class = paste("ui slider ss-slider", class),
+      `data-min` = min, `data-max` = max, `data-step` = step, `data-start` = value
+    )
+  }
+
 }
 
 #' @param inputId Input name.
 #' @param label Display label for the control, or NULL for no label.
 #' @param width character with width of slider.
+#' @param ticks \code{FALSE} to hide tick marks, \code{TRUE} to show them according to some simple heuristics
 #' @param ... additional arguments
 #' @rdname slider
 #' @export
-sliderInput <- function(inputId, label, min, max, value, step = 1, width = NULL, ...) {
+sliderInput <- function(inputId, label, min, max, value, step = 1, width = NULL, ticks = TRUE, ...) {
+  class <- "labeled"
+  if (ticks) class <- paste(class, "ticked")
   warn_unsupported_args(list(...))
+
+  if (length(value) == 1) {
+    slider <- slider_input(inputId, value, min, max, step = step, class = class)
+  } else {
+    slider <- range_input(inputId, value[1], value[2], min, max, step = step, class = class)
+  }
+
   form(
     style = if (!is.null(width)) glue::glue("width: {shiny::validateCssUnit(width)};"),
     tags$label(label),
-    slider_input(inputId, value, min, max, step = step)
+    slider
   )
 }
 
@@ -90,7 +119,7 @@ sliderInput <- function(inputId, label, min, max, value, step = 1, width = NULL,
 #' @export
 range_input <- function(input_id, value, value2, min, max, step = 1, class = NULL) {
   div(
-    id = input_id, class = paste("ui range slider", class),
+    id = input_id, class = paste("ui range slider ss-slider", class),
     `data-min` = min, `data-max` = max, `data-step` = step, `data-start` = value, `data-end` = value2
   )
 }
