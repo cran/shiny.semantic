@@ -18,7 +18,7 @@ $.extend(semanticSliderBinding, {
       }
       sliderOptions.max = sliderData.ticks.length - 1;
     } else {
-      sliderOptions.interpretLabel = Number(sliderData.min);
+      sliderOptions.min = Number(sliderData.min);
       sliderOptions.max = Number(sliderData.max);
       sliderOptions.step = Number(sliderData.step);
       sliderOptions.start = Number(sliderData.start);
@@ -55,8 +55,6 @@ $.extend(semanticSliderBinding, {
       return value;
     }
   },
-
-  // Trying something to get the thumb value rather than input value
   getType: function(el) {
     if ($(el).data('ticks')) {
       return false;
@@ -64,7 +62,6 @@ $.extend(semanticSliderBinding, {
       return 'shiny.number';
     }
   },
-
   // Given the DOM element for the input, set the value.
   setValue: function(el, value) {
     if ($(el).data('ticks')) {

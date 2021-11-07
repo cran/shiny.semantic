@@ -162,6 +162,7 @@ semanticPage <- function(..., title = "", theme = NULL, suppress_bootstrap = TRU
       shiny::tags$link(rel = "stylesheet", type = "text/css",
                        href = "shiny.semantic/shiny-semantic-DT.css"),
       shiny::tags$script(src = "shiny.semantic/shiny-semantic-modal.js"),
+      shiny::tags$script(src = "shiny.semantic/shiny-semantic-checkbox.js"),
       shiny::tags$script(src = "shiny.semantic/shiny-semantic-dropdown.js"),
       shiny::tags$script(src = "shiny.semantic/shiny-semantic-button.js"),
       shiny::tags$script(src = "shiny.semantic/shiny-semantic-slider.js"),
@@ -171,9 +172,10 @@ semanticPage <- function(..., title = "", theme = NULL, suppress_bootstrap = TRU
       shiny::tags$script(src = "shiny.semantic/shiny-semantic-rating.js"),
       shiny::tags$script(src = "shiny.semantic/shiny-semantic-tabset.js"),
       shiny::tags$script(src = "shiny.semantic/shiny-semantic-progress.js"),
-      shiny::tags$script(src = "shiny.semantic/shiny-semantic-toast.js")
+      shiny::tags$script(src = "shiny.semantic/shiny-semantic-toast.js"),
+      shiny::tags$script(src = "shiny.semantic/shiny-semantic-step.js")
     ),
-    shiny::tags$body(style = glue::glue("margin:{margin}; min-height: 611px;"),
+    shiny::tags$body(style = glue::glue("margin:{margin};"),
                      suppress_bootstrap,
                      ...)
   )
